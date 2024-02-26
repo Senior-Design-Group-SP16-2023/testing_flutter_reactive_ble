@@ -18,7 +18,9 @@ class BluetoothViewModel extends ChangeNotifier {
   late BleLogger _logger;
   //late BleStatusMonitor _statusMonitor;
 
-  final Uuid uuid1 = Uuid([0x7147ac18, 0xc824, 0x438e, 0x8506, 0x60829fbd96a3]);
+  //final Uuid uuid1 = Uuid([0x7147ac18, 0xc824, 0x438e, 0x8506, 0x60829fbd96a3]);
+
+  final Uuid uuid1 = Uuid.parse('7147ac18-c824-438e-8506-60829fbd96a3');
 
  late List<Uuid> serviceIds;
 
