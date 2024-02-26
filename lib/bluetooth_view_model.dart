@@ -10,7 +10,6 @@ import 'package:testing_flutter_reactive_ble/ble/ble_logger.dart';
 import 'package:testing_flutter_reactive_ble/ble/ble_status_monitor.dart';
 
 class BluetoothViewModel extends ChangeNotifier {
-
   final _ble = FlutterReactiveBle();
   late BleDeviceConnector _connector;
   late BleScanner _scanner;
@@ -18,20 +17,14 @@ class BluetoothViewModel extends ChangeNotifier {
   late BleLogger _logger;
   //late BleStatusMonitor _statusMonitor;
 
-  //final Uuid uuid1 = Uuid([0x7147ac18, 0xc824, 0x438e, 0x8506, 0x60829fbd96a3]);
-
   final Uuid uuid1 = Uuid.parse('7147ac18-c824-438e-8506-60829fbd96a3');
 
- late List<Uuid> serviceIds;
-
-
-
-
+  late List<Uuid> serviceIds;
 
   BluetoothViewModel() {
     print("LOADING");
     print(uuid1.expanded);
-    serviceIds = [uuid1];
+    serviceIds = [];
     _logger = BleLogger(ble: _ble);
     _connector = BleDeviceConnector(ble: _ble, logMessage: _logger.addToLog);
     _scanner = BleScanner(ble: _ble, logMessage: _logger.addToLog);
@@ -46,20 +39,16 @@ class BluetoothViewModel extends ChangeNotifier {
     );
     print("INITIALISED");
     _ble.statusStream.listen((status) {
-      if(status == BleStatus.unsupported){
+      if (status == BleStatus.unsupported) {
         print('BLE is not supported');
       }
       if (status == BleStatus.ready) {
         scan();
-      }
-      else{
+      } else {
         print(status);
       }
     });
-
   }
-
-
 
   Future<void> scan() async {
     print("SCANNING");
@@ -79,7 +68,7 @@ class BluetoothViewModel extends ChangeNotifier {
     //get the discovered devices
     final discoveredDevices = _scanner.discoveredDevices;
     //connect to every device discovered
-    if(discoveredDevices.isEmpty){
+    if (discoveredDevices.isEmpty) {
       print('No devices found');
       return;
     }
@@ -97,31 +86,25 @@ class BluetoothViewModel extends ChangeNotifier {
       print('Service: ${service.id}');
       for (Characteristic characteristic in service.characteristics) {
         print('Characteristic: ${characteristic.id}');
-        if(characteristic.isNotifiable){
+        if (characteristic.isNotifiable) {
           toSubscribe = characteristic;
         }
       }
     }
     //subscribe to the characteristic
-    if(toSubscribe == null){
+    if (toSubscribe == null) {
       print('No characteristic to subscribe to');
       return;
     }
-    StreamSubscription<List<int>> subStream = toSubscribe.subscribe().listen((event) {
+    StreamSubscription<List<int>> subStream =
+        toSubscribe.subscribe().listen((event) {
       print('Received data: $event');
     }, onError: (Object e) {
       print('Error: $e');
     });
-
-
-
-
-}
-
-
+  }
 
   Future<void> disconnect(String deviceId) async {
     await _connector.disconnect(deviceId);
   }
-
 }
