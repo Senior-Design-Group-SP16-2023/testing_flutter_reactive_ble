@@ -57,10 +57,15 @@ class BluetoothViewModel extends ChangeNotifier {
       if (state.scanIsInProgress) {
         print('Scanning...');
       } else {
+        print('Scan finished');
         _scanner.stopScan();
         connect();
       }
     });
+  }
+
+  Future<void> stopScan() async {
+    _scanner.stopScan();
   }
 
   Future<void> connect() async {
