@@ -53,7 +53,7 @@ class BluetoothViewModel extends ChangeNotifier {
   Future<void> scan() async {
     print("SCANNING");
     _scanner.startScan(serviceIds);
-    _scanner.state.listen((state) {
+    StreamSubscription<BleScannerState> b = _scanner.state.listen((state) {
       if (state.scanIsInProgress) {
         print('Scanning...');
       } else {

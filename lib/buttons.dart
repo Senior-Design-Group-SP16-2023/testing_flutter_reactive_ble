@@ -22,8 +22,10 @@ class Buttons extends HookWidget {
         body: Column(
           children: [
             ElevatedButton(
-              onPressed: () {},
-              child: const Text('Connect'),
+              onPressed: () {
+                bluetoothViewModel.scan();
+              },
+              child: const Text('Start Scan'),
             ),
             ElevatedButton(
               onPressed: () {
