@@ -64,7 +64,6 @@ class BluetoothViewModel extends ChangeNotifier {
         connect();
       }
     });
-    b.cancel();
   }
 
   Future<void> stopScan() async {
