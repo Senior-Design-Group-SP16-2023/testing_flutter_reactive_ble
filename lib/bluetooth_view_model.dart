@@ -100,9 +100,9 @@ class BluetoothViewModel extends ChangeNotifier {
 
     // final device = discoveredDevices.first;
     // await _connector.connect(device.id);
-    print('Connected to ${deviceS.name}');
+    print('For Real connected to ${deviceS.name}');
 
-    List<Service> services = await _interactor.discoverServices(deviceS.id);
+    List<Service> services = await _interactor.discoverServices(deviceS.id); // fails here
 
     print('Discovered services: ${services.length}');
 

@@ -19,12 +19,15 @@ class BleDeviceInteractor {
 
   Future<List<Service>> discoverServices(String deviceId) async {
     try {
+      print("Start discovering services for: $deviceId");
       _logMessage('Start discovering services for: $deviceId');
       final result = await _bleDiscoverServices(deviceId);
       _logMessage('Discovering services finished');
+      print("Discovering services finished");
       return result;
     } on Exception catch (e) {
       _logMessage('Error occurred when discovering services: $e');
+      print("Error occurred when discovering services: $e");
       rethrow;
     }
   }
