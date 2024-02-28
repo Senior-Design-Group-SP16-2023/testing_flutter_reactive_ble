@@ -102,6 +102,9 @@ class BluetoothViewModel extends ChangeNotifier {
     // await _connector.connect(device.id);
     print('For Real connected to ${deviceS.name}');
 
+    //wait 3 seconds
+    await Future.delayed(const Duration(seconds: 3));
+
     List<Service> services = await _interactor.discoverServices(deviceS.id); // fails here
 
     print('Discovered services: ${services.length}');
