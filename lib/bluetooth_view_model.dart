@@ -80,14 +80,36 @@ class BluetoothViewModel extends ChangeNotifier {
       return;
     }
     //connect to the first one
-    final device = discoveredDevices.first;
-    await _connector.connect(device.id);
-    print('Connected to ${device.name}');
 
-    List<Service> services = await _interactor.discoverServices(device.id);
+    dynamic deviceS;
+
+    for(var device in discoveredDevices){
+      if(device.name == "NRF DEVBOARD"){
+        deviceS = device;
+        await _connector.connect(device.id);
+        print('Connected to ${device.name}');
+
+      }
+    }
+    if(deviceS == null){
+      print('No device found');
+      return;
+    }
+
+
+
+    // final device = discoveredDevices.first;
+    // await _connector.connect(device.id);
+    print('Connected to ${deviceS.name}');
+
+    List<Service> services = await _interactor.discoverServices(deviceS.id);
+
+    print('Discovered services: ${services.length}');
 
     //for each service, get the characteristics
     Characteristic? toSubscribe;
+
+    Characteristic? toWrite;
 
     for (Service service in services) {
       print('Service: ${service.id}');
@@ -95,6 +117,9 @@ class BluetoothViewModel extends ChangeNotifier {
         print('Characteristic: ${characteristic.id}');
         if (characteristic.isNotifiable) {
           toSubscribe = characteristic;
+        }
+        if(characteristic.isWritableWithResponse){
+          toWrite = characteristic;
         }
       }
     }
@@ -109,6 +134,8 @@ class BluetoothViewModel extends ChangeNotifier {
     }, onError: (Object e) {
       print('Error: $e');
     });
+
+
   }
 
   Future<void> disconnect(String deviceId) async {
