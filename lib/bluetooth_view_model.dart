@@ -81,7 +81,7 @@ class BluetoothViewModel extends ChangeNotifier {
     }
     //connect to the first one
 
-    dynamic deviceS;
+    DiscoveredDevice? deviceS;
 
     for(var device in discoveredDevices){
       if(device.name == "NRF DEVBOARD"){
@@ -91,6 +91,16 @@ class BluetoothViewModel extends ChangeNotifier {
 
       }
     }
+
+    await Future.delayed(const Duration(seconds: 3));
+
+    _connector.state.listen((event) {
+      print('Connection state: $event');
+      if(event.connectionState == DeviceConnectionState.connected){
+        print('We are live!');
+      }
+    });
+
     if(deviceS == null){
       print('No device found');
       return;
@@ -105,12 +115,11 @@ class BluetoothViewModel extends ChangeNotifier {
     print("Device ID: ${deviceS.id}");
 
     //wait 3 seconds
-    await Future.delayed(const Duration(seconds: 3));
+
 
     //get the 16 bit UUID of the device
-    final thing = Uuid.parse('6E7B');
 
-    List<Service> services = await _interactor.discoverServices('6E7B'); // fails here
+    List<Service> services = await _interactor.discoverServices(deviceS.id); // fails here
 
     print('Discovered services: ${services.length}');
 
