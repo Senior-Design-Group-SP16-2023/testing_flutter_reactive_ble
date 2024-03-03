@@ -119,7 +119,7 @@ class BluetoothViewModel extends ChangeNotifier {
 
     //get the 16 bit UUID of the device
 
-    List<Service> services = await _interactor.discoverServices(deviceS.id); // fails here
+    List<Service> services = await _interactor.discoverServices(deviceS.id);
 
     print('Discovered services: ${services.length}');
 
@@ -132,6 +132,7 @@ class BluetoothViewModel extends ChangeNotifier {
       print('Service: ${service.id}');
       for (Characteristic characteristic in service.characteristics) {
         print('Characteristic: ${characteristic.id}');
+        print(characteristic);
         if (characteristic.isNotifiable) {
           toSubscribe = characteristic;
         }
@@ -140,11 +141,17 @@ class BluetoothViewModel extends ChangeNotifier {
         }
       }
     }
+    //able to find all the characteristics
     //subscribe to the characteristic
     if (toSubscribe == null) {
       print('No characteristic to subscribe to');
       return;
+    } else {
+      print('Subscribing to: ${toSubscribe.id}');
     }
+    //print everything about the characteristic
+    print(toSubscribe);
+
     StreamSubscription<List<int>> subStream =
         toSubscribe.subscribe().listen((event) {
       print('Received data: $event');
@@ -156,6 +163,8 @@ class BluetoothViewModel extends ChangeNotifier {
   }
 
   Future<void> disconnect(String deviceId) async {
-    await _connector.disconnect(deviceId);
+    await _connector.disconnect(deviceId); 
   }
+
+  //maybe a dispose function
 }
