@@ -126,19 +126,20 @@ class BluetoothViewModel extends ChangeNotifier {
     //for each service, get the characteristics
     Characteristic? toSubscribe;
 
-    Characteristic? toWrite;
+    Characteristic? toWriteWithResponse;
 
     for (Service service in services) {
       print('Service: ${service.id}');
       for (Characteristic characteristic in service.characteristics) {
         print('Characteristic: ${characteristic.id}');
-        print(characteristic);
-        if (characteristic.isNotifiable) {
-          toSubscribe = characteristic;
-        }
-        if(characteristic.isWritableWithResponse){
-          toWrite = characteristic;
-        }
+        print(characteristic.id);
+        print(characteristic.isIndicatable);
+        print(characteristic.isNotifiable);
+        print(characteristic.isReadable);
+        print(characteristic.isWritableWithResponse);
+        print(characteristic.isWritableWithoutResponse);
+        print(characteristic.service);
+
       }
     }
     //able to find all the characteristics
@@ -150,7 +151,13 @@ class BluetoothViewModel extends ChangeNotifier {
       print('Subscribing to: ${toSubscribe.id}');
     }
     //print everything about the characteristic
-    print(toSubscribe);
+
+    if(toWrite == null){
+      print('No characteristic to write to');
+      return;
+    }else{
+      print('Writing to: ${toWrite.id}');
+    }
 
     StreamSubscription<List<int>> subStream =
         toSubscribe.subscribe().listen((event) {
