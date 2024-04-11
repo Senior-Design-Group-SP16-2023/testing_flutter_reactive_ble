@@ -128,6 +128,8 @@ class BluetoothViewModel extends ChangeNotifier {
 
     Characteristic? toWriteWithResponse;
 
+    Characteristic? toWrite;
+
     for (Service service in services) {
       print('Service: ${service.id}');
       for (Characteristic characteristic in service.characteristics) {
@@ -164,6 +166,10 @@ class BluetoothViewModel extends ChangeNotifier {
       print('Received data: $event');
     }, onError: (Object e) {
       print('Error: $e');
+    });
+
+    subStream.onDone(() {
+      print('Subscription done');
     });
 
 
