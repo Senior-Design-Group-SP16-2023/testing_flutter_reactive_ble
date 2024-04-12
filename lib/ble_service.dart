@@ -38,7 +38,9 @@ class BLEService extends ChangeNotifier {
   var _calibrateCharacteristic;
   var _readCharacteristic;
 
-  BleService() {
+  String name = '';
+
+  BLEService(this.name) {
     isReady = false;
     isConnected = false;
     notifyListeners();
@@ -63,7 +65,7 @@ class BLEService extends ChangeNotifier {
       requireLocationServicesEnabled: false,
     ).listen(
       (device) {
-        if (device.name == 'NRF DEVBOARD') {
+        if (device.name == name) {
           stopScan();
           targetDevice = device;
           connectToDevice();
