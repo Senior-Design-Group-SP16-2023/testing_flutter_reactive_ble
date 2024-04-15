@@ -9,7 +9,7 @@ void main() {
   runApp(const MyApp());
 }
 
-const String bleDeviceName = 'NRF DEVBOARD';
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => BluetoothViewModel()),
-        ChangeNotifierProvider(create: (context) => BLEService(bleDeviceName)),
+        ChangeNotifierProvider(create: (context) => BLEService()),
       ],
       child: Buttons2(),
     );

@@ -46,12 +46,12 @@ class Buttons2 extends HookWidget {
             ),
             ElevatedButton(
                 onPressed: () {
-                  bleService.startCalibration();
+                  bleService.beginCalibration();
                 },
                 child: const Text('Start Calibration')),
             ElevatedButton(
                 onPressed: () {
-                  bleService.stopCalibration();
+                  bleService.endCalibration();
                 },
                 child: const Text('Stop Calibration')),
             ElevatedButton(
@@ -61,7 +61,7 @@ class Buttons2 extends HookWidget {
                 child: const Text('Start Reading')),
             ElevatedButton(
                 onPressed: () {
-                  bleService.stopReading();
+                  bleService.endReading();
                 },
                 child: const Text('Stop Reading')),
             SingleChildScrollView(child: Text('Data'))

@@ -1,48 +1,22 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-import 'package:flutter/cupertino.dart';
 import 'dart:async';
-
-/**
- * References:
- * https://github.com/JimTompkins/happy_feet_app/blob/d9c497f47d0ca0a1a9cfd205edfe94427a28881a/lib/ble.dart
- */
+import 'package:testing_flutter_reactive_ble/my_device.dart';
 
 class BLEService extends ChangeNotifier {
-  static FlutterReactiveBle _ble = FlutterReactiveBle();
+  static final FlutterReactiveBle _ble = FlutterReactiveBle();
 
   bool isReady = false;
-  bool serviceDiscoveryComplete = true;
-  bool isConnected = false;
+  bool isSetup = false;
 
   StreamSubscription? _subscription;
-  StreamSubscription<ConnectionStateUpdate>? _connection;
-  final _devices = <DiscoveredDevice>[];
-  DiscoveredDevice? targetDevice;
-  List<Service> services = [];
-  StreamSubscription<List<int>>? _readSubscription;
+  final targetDevices = <MyDevice>[];
 
+  static const List<String> names = ['name1', 'name2', 'name3'];
 
-  //TODO: use real values for the UUIDs
-  //unsure if they will all have the same serviceId... very easy to change if so
-  static const String serviceUUID = '0000fff0-0000-1000-8000-00805f9b34fb';
-
-  static const String notifyCharacteristicUUID =
-      '0000fff1-0000-1000-8000-00805f9b34fb';
-  static const String calibrateCharacteristicUUID =
-      '0000fff2-0000-1000-8000-00805f9b34fb';
-  static const String readCharacteristicUUID =
-      '0000fff3-0000-1000-8000-00805f9b34fb';
-
-  var _notifyCharacteristic;
-  var _calibrateCharacteristic;
-  var _readCharacteristic;
-
-  String name = '';
-
-  BLEService(this.name) {
+  BLEService() {
     isReady = false;
-    isConnected = false;
+    isSetup = false;
     notifyListeners();
     _ble.logLevel = LogLevel.verbose;
     _ble.statusStream.listen((status) {
@@ -58,17 +32,31 @@ class BLEService extends ChangeNotifier {
     if (!isReady) {
       return;
     }
-    _devices.clear();
+    targetDevices.clear();
     _subscription = _ble.scanForDevices(
       withServices: [],
       scanMode: ScanMode.lowLatency,
       requireLocationServicesEnabled: false,
     ).listen(
       (device) {
-        if (device.name == name) {
-          stopScan();
-          targetDevice = device;
-          connectToDevice();
+        if (names.contains(device.name)) {
+          MyDevice newDevice = MyDevice(_ble, device);
+          targetDevices.add(newDevice);
+          late VoidCallback listener;
+          listener = () {
+            if (targetDevices.length == names.length &&
+                targetDevices
+                    .every((element) => element.isReadyNotifier.value)) {
+              isSetup = true;
+              notifyListeners();
+              newDevice.isReadyNotifier.removeListener(listener);
+            }
+          };
+          newDevice.isReadyNotifier.addListener(listener);
+          if (targetDevices.length == names.length) {
+            stopScan();
+            connectToDevices();
+          }
         }
       },
       onError: (e) {
@@ -84,118 +72,6 @@ class BLEService extends ChangeNotifier {
     stopScan();
   }
 
-  connectToDevice() async {
-    if (targetDevice == null) {
-      return;
-    }
-    _connection = _ble
-        .connectToDevice(
-      id: targetDevice!.id,
-      connectionTimeout: Duration(seconds: 2),
-    )
-        .listen((state) async {
-      if (state.connectionState == DeviceConnectionState.connected) {
-        isConnected = true;
-        notifyListeners();
-        await Future.delayed(const Duration(seconds: 1));
-        getCharacteristics();
-      }
-    }, onError: (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    });
-  }
-
-  getCharacteristics() async {
-    if (targetDevice == null) {
-      return;
-    }
-    await _ble.discoverAllServices(targetDevice!.id);
-    services = await _ble.getDiscoveredServices(targetDevice!.id);
-    _calibrateCharacteristic = QualifiedCharacteristic(
-        characteristicId: Uuid.parse(calibrateCharacteristicUUID),
-        serviceId: Uuid.parse(serviceUUID),
-        deviceId: targetDevice!.id);
-    _notifyCharacteristic = QualifiedCharacteristic(
-        characteristicId: Uuid.parse(notifyCharacteristicUUID),
-        serviceId: Uuid.parse(serviceUUID),
-        deviceId: targetDevice!.id);
-    _readCharacteristic = QualifiedCharacteristic(
-        characteristicId: Uuid.parse(readCharacteristicUUID),
-        serviceId: Uuid.parse(serviceUUID),
-        deviceId: targetDevice!.id);
-    serviceDiscoveryComplete = true;
-    notifyListeners();
-  }
-
-  Future<void> startCalibration() async {
-    if (targetDevice == null) {
-      return;
-    }
-    //TODO: with or without response, that is the question
-    await _ble.writeCharacteristicWithoutResponse(
-      _calibrateCharacteristic,
-      value: [0x01],
-    );
-  }
-
-  Future<void> stopCalibration() async {
-    if (targetDevice == null) {
-      return;
-    }
-    await _ble.writeCharacteristicWithoutResponse(
-      _calibrateCharacteristic,
-      value: [0x00],
-    );
-  }
-
-  Future<void> enableNotifications() async {
-    if (targetDevice == null) {
-      return;
-    }
-    await _ble.writeCharacteristicWithoutResponse(
-      _notifyCharacteristic,
-      value: [0x01],
-    );
-  }
-
-  Future<void> disableNotifications() async {
-    //not sure why you would want to do this, but here it is
-    if (targetDevice == null) {
-      return;
-    }
-    await _ble.writeCharacteristicWithoutResponse(
-      _notifyCharacteristic,
-      value: [0x00],
-    );
-  }
-
-  Future<void> beginReading() async {
-    if (targetDevice == null) {
-      return;
-    }
-    _readSubscription = _ble.subscribeToCharacteristic(_readCharacteristic).listen((data) {
-      if(kDebugMode){
-        print(data);
-      }
-      if(data.isNotEmpty){
-        //unsure if it is easier to parse data here or elsewhere
-
-      }
-    }
-    );
-  }
-
-  Future<void> stopReading() async {
-    if(_readSubscription != null){
-      await _readSubscription!.cancel();
-      _readSubscription = null;
-    }
-  }
-
-
-
   Future<void> stopScan() async {
     try {
       await _subscription?.cancel();
@@ -206,16 +82,53 @@ class BLEService extends ChangeNotifier {
     }
   }
 
-  Future<void> disconnect() async {
-    try {
-      await _subscription?.cancel();
-      await _connection?.cancel();
-      isConnected = false;
-      notifyListeners();
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+  connectToDevices() {
+    for (MyDevice device in targetDevices) {
+      device.connectToDevice();
+    }
+  }
+
+  disconnect() async {
+    for (MyDevice device in targetDevices) {
+      await device.disconnect();
+    }
+    isSetup = false;
+    notifyListeners();
+  }
+
+  beginReading() {
+    for (MyDevice device in targetDevices) {
+      device.beginReading();
+    }
+  }
+
+  endReading() {
+    for (MyDevice device in targetDevices) {
+      device.endReading();
+    }
+  }
+
+  enableNotifications() {
+    for (MyDevice device in targetDevices) {
+      device.enableNotifications();
+    }
+  }
+
+  disableNotifications() {
+    for (MyDevice device in targetDevices) {
+      device.disableNotifications();
+    }
+  }
+
+  beginCalibration() {
+    for (MyDevice device in targetDevices) {
+      device.beginCalibration();
+    }
+  }
+
+  endCalibration() {
+    for (MyDevice device in targetDevices) {
+      device.endCalibration();
     }
   }
 }
