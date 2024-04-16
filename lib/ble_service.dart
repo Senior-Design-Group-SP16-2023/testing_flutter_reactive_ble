@@ -12,7 +12,7 @@ class BLEService extends ChangeNotifier {
   StreamSubscription? _subscription;
   final targetDevices = <MyDevice>[];
 
-  static const List<String> names = ['name1', 'name2', 'name3'];
+  static const List<String> names = ['NRF DEVBOARD'];
 
   BLEService() {
     isReady = false;
@@ -49,8 +49,8 @@ class BLEService extends ChangeNotifier {
                     .every((element) => element.isReadyNotifier.value)) {
               isSetup = true;
               notifyListeners();
-              newDevice.isReadyNotifier.removeListener(listener);
             }
+            newDevice.isReadyNotifier.removeListener(listener);
           };
           newDevice.isReadyNotifier.addListener(listener);
           if (targetDevices.length == names.length) {
