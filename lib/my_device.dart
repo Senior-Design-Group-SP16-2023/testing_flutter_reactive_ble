@@ -113,9 +113,9 @@ class MyDevice {
 
         //pad the string with 0s
 
-        print(correctEvent[0] | (correctEvent[1] << 8));
-        print(correctEvent[0] + (correctEvent[1] << 8));
-
+        print(correctEvent[4] | (correctEvent[5] << 8));
+        print(correctEvent[4] + (correctEvent[5] << 8));
+        print(correctEvent[6] + (correctEvent[7] << 8));
 
 
 
