@@ -12,7 +12,7 @@ class BLEService extends ChangeNotifier {
   StreamSubscription? _subscription;
   final targetDevices = <MyDevice>[];
 
-  static const List<String> names = ['NRF DEVBOARD'];
+  static const List<String> names = ['SP16 Sensor Board'];
 
   BLEService() {
     isReady = false;
