@@ -87,8 +87,8 @@ class MyDevice {
   //x y z are 2 bytes each, time is 4 bytes
 
   int convert(int data){
-    if(data & 0x80 != 0) {
-      return -((~data & 0xFF) + 1);
+    if(data & 0x8000 != 0) {
+      return -((~data & 0xFFFF) + 1);
     }
     return data;
   }
@@ -105,9 +105,18 @@ class MyDevice {
         print(event);
 
         //each string pair needs to be swapped, so 0 need to be 1 and 1 needs to be 0
-        final correctEvent = [event[1], event[0], event[3], event[2], event[5], event[4], event[7], event[6], event[9], event[8], event[11], event[10], event[12], event[13], event[14], event[15]];
+        final correctEvent = [event[1], event[0], event[3], event[2], event[5], event[4], event[7], event[6], event[9], event[8], event[11], event[10], event[15], event[14], event[13], event[12]];
 
         print(correctEvent);
+
+        event[1].toRadixString(16);
+
+        //pad the string with 0s
+
+        print(correctEvent[0] | (correctEvent[1] << 8));
+        print(correctEvent[0] + (correctEvent[1] << 8));
+
+
 
 
         int gyroX = convert(correctEvent[0] | (correctEvent[1] << 8));
