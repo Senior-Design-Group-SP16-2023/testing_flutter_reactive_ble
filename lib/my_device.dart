@@ -90,6 +90,9 @@ class MyDevice {
     _readSubscription = _dataCharacteristic.subscribe().listen((event) {
       if (kDebugMode) {
         //byte string, 16 bytes long, first 2 are x
+        //signed int 16
+        print(event);
+
 
         int gyroX = event[0] + (event[1] << 8);
         int gyroY = event[2] + (event[3] << 8);
