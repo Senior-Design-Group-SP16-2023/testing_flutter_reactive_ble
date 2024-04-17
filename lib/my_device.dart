@@ -45,6 +45,15 @@ class MyDevice {
   getCharacteristics() async {
     await _ble.discoverAllServices(targetDevice.id);
     services = await _ble.getDiscoveredServices(targetDevice.id);
+    //print all the services
+    if(kDebugMode){
+      for (var service in services) {
+          print(service);
+        for( var characteristic in service.characteristics){
+            print(characteristic);
+        }
+      }
+    }
     _dataCharacteristic = QualifiedCharacteristic(
         characteristicId: Uuid.parse(sensorDataUUID),
         serviceId: Uuid.parse(sensorServiceUUID),
