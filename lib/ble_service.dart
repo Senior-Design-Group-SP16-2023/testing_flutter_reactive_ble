@@ -29,8 +29,8 @@ class BLEService extends ChangeNotifier {
   }
 
   startScan() {
-    start = false;
-    disconnect();
+    start = true;
+    // disconnect();
     while(!start) {
       //wait for ble to be ready
     }
