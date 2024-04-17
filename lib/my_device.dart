@@ -79,7 +79,7 @@ class MyDevice {
   }
 
   Future<void> beginReading() async {
-    _dataCharacteristic.subscribe().listen((event) {
+    _readSubscription = _dataCharacteristic.subscribe().listen((event) {
       if (kDebugMode) {
         print(event);
       }
