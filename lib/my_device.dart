@@ -91,7 +91,8 @@ class MyDevice {
       if (kDebugMode) {
         //byte string, 16 bytes long, first 2 are x
         //signed int 16
-        print(event);
+        //print event as a hex string
+        print(event.map((e) => e.toRadixString(16)).join(' '));
 
 
         int gyroX = event[0] + (event[1] << 8);
