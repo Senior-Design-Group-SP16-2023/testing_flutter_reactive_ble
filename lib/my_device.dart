@@ -8,7 +8,8 @@ class MyDevice {
   StreamSubscription<List<int>>? _readSubscription;
   ValueNotifier<bool> isReadyNotifier = ValueNotifier<bool>(false);
 
-  static const String sensorServiceUUID = '7147ac18-c824-438e-8506-60829fbd96a3';
+  static const String sensorServiceUUID =
+      '7147ac18-c824-438e-8506-60829fbd96a3';
 
   static const String sensorDataUUID = 'bd148149-4469-479a-856f-497ea5e785e5';
 
@@ -46,48 +47,41 @@ class MyDevice {
     await _ble.discoverAllServices(targetDevice.id);
     services = await _ble.getDiscoveredServices(targetDevice.id);
     //print all the services
-    if(kDebugMode){
-      for (var service in services) {
-          print(service);
-        for( var characteristic in service.characteristics){
-            print(characteristic);
+    for (var service in services) {
+      if (kDebugMode) print(service);
+      for (var characteristic in service.characteristics) {
+        if (kDebugMode) print(characteristic);
+        if (characteristic.id.toString() == sensorDataUUID) {
+          _dataCharacteristic = characteristic;
+        }
+        if (characteristic.id.toString() == sensorConfigUUID) {
+          _configCharacteristic = characteristic;
         }
       }
     }
-    _dataCharacteristic = QualifiedCharacteristic(
-        characteristicId: Uuid.parse(sensorDataUUID),
-        serviceId: Uuid.parse(sensorServiceUUID),
-        deviceId: targetDevice.id);
-    _configCharacteristic = QualifiedCharacteristic(
-        characteristicId: Uuid.parse(sensorConfigUUID),
-        serviceId: Uuid.parse(sensorServiceUUID),
-        deviceId: targetDevice.id);
+    // _dataCharacteristic = QualifiedCharacteristic(
+    //     characteristicId: Uuid.parse(sensorDataUUID),
+    //     serviceId: Uuid.parse(sensorServiceUUID),
+    //     deviceId: targetDevice.id);
+    // _configCharacteristic = QualifiedCharacteristic(
+    //     characteristicId: Uuid.parse(sensorConfigUUID),
+    //     serviceId: Uuid.parse(sensorServiceUUID),
+    //     deviceId: targetDevice.id);
     isReadyNotifier.value = true;
   }
 
   Future<void> beginCalibration() async {
-    await _ble.writeCharacteristicWithoutResponse(
-      _configCharacteristic,
-      value: [0x01],
-    );
+    await _configCharacteristic.write([0x01]);
   }
 
   Future<void> endCalibration() async {
-    await _ble.writeCharacteristicWithoutResponse(
-      _configCharacteristic,
-      value: [0x00],
-    );
+    await _configCharacteristic.write([0x00]);
   }
 
   Future<void> beginReading() async {
-    _readSubscription =
-        _ble.subscribeToCharacteristic(_dataCharacteristic).listen((data) {
+    _dataCharacteristic.subscribe().listen((event) {
       if (kDebugMode) {
-        print(data);
-      }
-      if (data.isNotEmpty) {
-
-        //unsure if it is easier to parse data here or elsewhere
+        print(event);
       }
     });
   }
