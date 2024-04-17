@@ -96,7 +96,9 @@ class MyDevice {
         //each string pair needs to be swapped, so 0 need to be 1 and 1 needs to be 0
         final correctEvent = [event[0], event[1], event[3], event[2], event[5], event[4], event[6], event[7], event[9], event[8], event[11], event[10], event[12], event[13], event[14], event[15]];
 
-        final hexString = correctEvent.map((e) => e.toRadixString(16)).join(' ');
+        final hexString = correctEvent.map((e) => e.toRadixString(16)).join();
+
+        print(hexString);
 
         int gyroX = int.parse(hexString.substring(0, 2), radix: 16);
         if(gyroX & 0x8000 != 0) {
