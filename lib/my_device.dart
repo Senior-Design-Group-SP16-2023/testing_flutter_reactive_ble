@@ -92,16 +92,44 @@ class MyDevice {
         //byte string, 16 bytes long, first 2 are x
         //signed int 16
         //print event as a hex string
-        print(event.map((e) => e.toRadixString(16)).join(' '));
+
+        //each string pair needs to be swapped, so 0 need to be 1 and 1 needs to be 0
+        final correctEvent = [event[0], event[1], event[3], event[2], event[5], event[4], event[6], event[7], event[9], event[8], event[11], event[10], event[12], event[13], event[14], event[15]];
+
+        final hexString = correctEvent.map((e) => e.toRadixString(16)).join(' ');
+
+        int gyroX = int.parse(hexString.substring(0, 2), radix: 16);
+        if(gyroX & 0x8000 != 0) {
+          gyroX = -((~gyroX & 0xFFFF) + 1);
+        }
 
 
-        int gyroX = (event[0] & 0xFF) | ((event[1] & 0xFF) << 8);
-        int gyroY = (event[2] & 0xFF) | ((event[3] & 0xFF) << 8);
-        int gyroZ = (event[4] & 0xFF) | ((event[5] & 0xFF) << 8);
-        int accelX = (event[6] & 0xFF) | ((event[7] & 0xFF) << 8);
-        int accelY = (event[8] & 0xFF) | ((event[9] & 0xFF) << 8);
-        int accelZ = (event[10] & 0xFF) | ((event[11] & 0xFF) << 8);
-        int timestamp = (event[12] & 0xFF) | ((event[13] & 0xFF) << 8) | ((event[14] & 0xFF) << 16) | ((event[15] & 0xFF) << 24);
+        int gyroY = int.parse(hexString.substring(2, 4), radix: 16);
+        if(gyroY & 0x8000 != 0) {
+          gyroY = -((~gyroY & 0xFFFF) + 1);
+        }
+
+        int gyroZ = int.parse(hexString.substring(4, 6), radix: 16);
+        if(gyroZ & 0x8000 != 0) {
+          gyroZ = -((~gyroZ & 0xFFFF) + 1);
+        }
+
+        int accelX = int.parse(hexString.substring(6, 8), radix: 16);
+        if(accelX & 0x8000 != 0) {
+          accelX = -((~accelX & 0xFFFF) + 1);
+        }
+
+        int accelY = int.parse(hexString.substring(8, 10), radix: 16);
+        if(accelY & 0x8000 != 0) {
+          accelY = -((~accelY & 0xFFFF) + 1);
+        }
+
+        int accelZ = int.parse(hexString.substring(10, 12), radix: 16);
+        if(accelZ & 0x8000 != 0) {
+          accelZ = -((~accelZ & 0xFFFF) + 1);
+        }
+
+        int timestamp = int.parse(hexString.substring(12, 16), radix: 16);
 
         print('gyroX: $gyroX, gyroY: $gyroY, gyroZ: $gyroZ, accelX: $accelX, accelY: $accelY, accelZ: $accelZ, timestamp: $timestamp');
 
