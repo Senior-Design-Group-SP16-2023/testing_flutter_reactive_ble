@@ -86,8 +86,8 @@ class MyDevice {
   //data format
   //x y z are 2 bytes each, time is 4 bytes
 
-  static const int max = (2^15)-1;
-  static const int sub = 2^16;
+  static const int max = 32767;
+  static const int sub = 65536;
 
   int convert(int data){
     print(data);
