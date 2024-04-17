@@ -119,7 +119,7 @@ class MyDevice {
         int accelZ = convert(correctEvent[10] << 8 | correctEvent[11]);
 
 
-        int timestamp = correctEvent[12] | (correctEvent[13] << 8) | (correctEvent[14] << 16) | (correctEvent[15] << 24);
+        int timestamp = correctEvent[15] | (correctEvent[14] << 8) | (correctEvent[13] << 16) | (correctEvent[12] << 24);
 
 
         print('gyroX: $gyroX, gyroY: $gyroY, gyroZ: $gyroZ, accelX: $accelX, accelY: $accelY, accelZ: $accelZ, timestamp: $timestamp');
