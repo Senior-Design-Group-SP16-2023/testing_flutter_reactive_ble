@@ -13,6 +13,9 @@ class BLEService extends ChangeNotifier {
   StreamSubscription? _subscription;
   final targetDevices = <MyDevice>[];
 
+  static const String sensorServiceUUID =
+      '7147ac18-c824-438e-8506-60829fbd96a3';
+
   static const List<String> names = ['SP16 Sensor Board'];
 
   BLEService() {
@@ -39,7 +42,7 @@ class BLEService extends ChangeNotifier {
     }
     targetDevices.clear();
     _subscription = _ble.scanForDevices(
-      withServices: [],
+      withServices: [Uuid.parse(sensorServiceUUID)],
       scanMode: ScanMode.lowLatency,
       requireLocationServicesEnabled: false,
     ).listen(
