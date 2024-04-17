@@ -108,18 +108,6 @@ class BLEService extends ChangeNotifier {
     }
   }
 
-  enableNotifications() {
-    for (MyDevice device in targetDevices) {
-      device.enableNotifications();
-    }
-  }
-
-  disableNotifications() {
-    for (MyDevice device in targetDevices) {
-      device.disableNotifications();
-    }
-  }
-
   beginCalibration() {
     for (MyDevice device in targetDevices) {
       device.beginCalibration();

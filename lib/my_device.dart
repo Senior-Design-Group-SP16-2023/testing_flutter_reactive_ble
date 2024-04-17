@@ -8,18 +8,16 @@ class MyDevice {
   StreamSubscription<List<int>>? _readSubscription;
   ValueNotifier<bool> isReadyNotifier = ValueNotifier<bool>(false);
 
-  static const String serviceUUID = '0000fff0-0000-1000-8000-00805f9b34fb';
+  static const String sensorServiceUUID = '0x7147ac18-c824-438e-8506-60829fbd96a3';
 
-  static const String notifyCharacteristicUUID =
-      '0000fff1-0000-1000-8000-00805f9b34fb';
-  static const String calibrateCharacteristicUUID =
-      '0000fff2-0000-1000-8000-00805f9b34fb';
-  static const String readCharacteristicUUID =
-      '0000fff3-0000-1000-8000-00805f9b34fb';
+  static const String sensorDataUUID = '0xbd148149-4469-479a-856f-497ea5e785e5';
 
-  dynamic _notifyCharacteristic;
-  dynamic _calibrateCharacteristic;
-  dynamic _readCharacteristic;
+  static const String sensorConfigUUID = '0x95f61667-ffd9-7d9e-fe41-9aed7794ef2f';
+
+  //6 bytes gyro, 6 bytes accel, 4 bytes timestamp 32 bit int
+
+  dynamic _dataCharacteristic;
+  dynamic _configCharacteristic;
 
   final FlutterReactiveBle _ble;
   DiscoveredDevice targetDevice;
@@ -47,56 +45,39 @@ class MyDevice {
   getCharacteristics() async {
     await _ble.discoverAllServices(targetDevice.id);
     services = await _ble.getDiscoveredServices(targetDevice.id);
-    _calibrateCharacteristic = QualifiedCharacteristic(
-        characteristicId: Uuid.parse(calibrateCharacteristicUUID),
-        serviceId: Uuid.parse(serviceUUID),
+    _dataCharacteristic = QualifiedCharacteristic(
+        characteristicId: Uuid.parse(sensorDataUUID),
+        serviceId: Uuid.parse(sensorServiceUUID),
         deviceId: targetDevice.id);
-    _notifyCharacteristic = QualifiedCharacteristic(
-        characteristicId: Uuid.parse(notifyCharacteristicUUID),
-        serviceId: Uuid.parse(serviceUUID),
-        deviceId: targetDevice.id);
-    _readCharacteristic = QualifiedCharacteristic(
-        characteristicId: Uuid.parse(readCharacteristicUUID),
-        serviceId: Uuid.parse(serviceUUID),
+    _configCharacteristic = QualifiedCharacteristic(
+        characteristicId: Uuid.parse(sensorConfigUUID),
+        serviceId: Uuid.parse(sensorServiceUUID),
         deviceId: targetDevice.id);
     isReadyNotifier.value = true;
   }
 
   Future<void> beginCalibration() async {
     await _ble.writeCharacteristicWithoutResponse(
-      _calibrateCharacteristic,
+      _configCharacteristic,
       value: [0x01],
     );
   }
 
   Future<void> endCalibration() async {
     await _ble.writeCharacteristicWithoutResponse(
-      _calibrateCharacteristic,
-      value: [0x00],
-    );
-  }
-
-  Future<void> enableNotifications() async {
-    await _ble.writeCharacteristicWithoutResponse(
-      _notifyCharacteristic,
-      value: [0x01],
-    );
-  }
-
-  Future<void> disableNotifications() async {
-    await _ble.writeCharacteristicWithoutResponse(
-      _notifyCharacteristic,
+      _configCharacteristic,
       value: [0x00],
     );
   }
 
   Future<void> beginReading() async {
     _readSubscription =
-        _ble.subscribeToCharacteristic(_readCharacteristic).listen((data) {
+        _ble.subscribeToCharacteristic(_dataCharacteristic).listen((data) {
       if (kDebugMode) {
         print(data);
       }
       if (data.isNotEmpty) {
+
         //unsure if it is easier to parse data here or elsewhere
       }
     });

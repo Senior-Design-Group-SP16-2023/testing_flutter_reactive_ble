@@ -33,18 +33,6 @@ class Buttons2 extends HookWidget {
               child: const Text('Stop Scan'),
             ),
             ElevatedButton(
-              onPressed: () {
-                bleService.enableNotifications();
-              },
-              child: const Text('Enable Notifications'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                bleService.disableNotifications();
-              },
-              child: const Text('Disable Notifications'),
-            ),
-            ElevatedButton(
                 onPressed: () {
                   bleService.beginCalibration();
                 },
