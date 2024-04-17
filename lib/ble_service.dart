@@ -14,6 +14,13 @@ class BLEService extends ChangeNotifier {
   final targetDevices = <BLEDevice>[];
 
   BLEService() {
+    if (disableBluetooth) {
+      //use disableBluetooth when running on emulator to get past screens that require bluetooth
+      isBluetoothOn = true;
+      isReadyToWorkout = true;
+      notifyListeners();
+      return;
+    }
     isBluetoothOn = false;
     isReadyToWorkout = false;
     notifyListeners();
@@ -31,6 +38,7 @@ class BLEService extends ChangeNotifier {
   }
 
   startScan() {
+    if (disableBluetooth) return;
     disconnect();
     targetDevices.clear();
     _subscription = _ble.scanForDevices(
@@ -88,12 +96,14 @@ class BLEService extends ChangeNotifier {
   }
 
   beginReading() {
+    if (disableBluetooth) return;
     for (BLEDevice device in targetDevices) {
       device.beginReading();
     }
   }
 
-  endReading() {
+  List<List<List<int>>> endReading() {
+    if (disableBluetooth) return [];
     for (BLEDevice device in targetDevices) {
       device.endReading();
     }
@@ -104,9 +114,11 @@ class BLEService extends ChangeNotifier {
     // if(kDebugMode) {
     //   print(data);
     // }
+    return data;
   }
 
   beginCalibration() {
+    if (disableBluetooth) return;
     for (BLEDevice device in targetDevices) {
       device.beginCalibration();
     }

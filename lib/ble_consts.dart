@@ -1,3 +1,6 @@
+//use disableBluetooth when running on emulator to get past screens that require bluetooth
+const disableBluetooth = false;
+
 const numDevices = 1;
 
 const reconnectAttempts = 5;

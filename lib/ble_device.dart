@@ -32,14 +32,14 @@ class BLEDevice {
     )
         .listen((state) async {
       if (state.connectionState == DeviceConnectionState.connected) {
-        if(kDebugMode) print('Connected');
+        if (kDebugMode) print('Connected');
         await Future.delayed(const Duration(seconds: 1));
         getCharacteristics();
       }
       if (state.connectionState == DeviceConnectionState.disconnected) {
         isReadyNotifier.value = false;
         if (reconnectCounter < reconnectAttempts) {
-          if(kDebugMode) print('Reconnecting...');
+          if (kDebugMode) print('Reconnecting...');
           reconnectCounter++;
           connectToDevice();
         }
@@ -68,9 +68,9 @@ class BLEDevice {
     }
     isReadyNotifier.value =
         _dataCharacteristic != null && _configCharacteristic != null;
+    if (isReadyNotifier.value) reconnectCounter = 0;
   }
 
-  //calibration takes 2.5 seconds on the board...
   Future<void> beginCalibration() async {
     await _configCharacteristic.write([0x01]);
   }
@@ -87,36 +87,15 @@ class BLEDevice {
 
   Future<void> beginReading() async {
     _readSubscription = _dataCharacteristic.subscribe().listen((event) {
-      final correctEvent = [
-        event[1],
-        event[0],
-        event[3],
-        event[2],
-        event[5],
-        event[4],
-        event[7],
-        event[6],
-        event[9],
-        event[8],
-        event[11],
-        event[10],
-        event[15],
-        event[14],
-        event[13],
-        event[12]
-      ];
+      int gyroX = convert(event[0] | (event[1] << 8));
+      int gyroY = convert(event[2] | (event[3] << 8));
+      int gyroZ = convert(event[4] | (event[5] << 8));
+      // int accelX = convert(event[6] | (event[7] << 8));
+      // int accelY = convert(event[8] | (event[9] << 8));
+      // int accelZ = convert(event[10] | (event[11] << 8));
 
-      int gyroX = convert(correctEvent[0] << 8 | correctEvent[1]);
-      int gyroY = convert(correctEvent[2] << 8 | correctEvent[3]);
-      int gyroZ = convert(correctEvent[4] << 8 | correctEvent[5]);
-      // int accelX = convert(correctEvent[6] << 8 | correctEvent[7]);
-      // int accelY = convert(correctEvent[8] << 8 | correctEvent[9]);
-      // int accelZ = convert(correctEvent[10] << 8 | correctEvent[11]);
-
-      int timestamp = correctEvent[15] |
-          (correctEvent[14] << 8) |
-          (correctEvent[13] << 16) |
-          (correctEvent[12] << 24);
+      int timestamp =
+          event[12] | (event[13] << 8) | (event[14] << 16) | (event[15] << 24);
 
       X.add(gyroX);
       Y.add(gyroY);
