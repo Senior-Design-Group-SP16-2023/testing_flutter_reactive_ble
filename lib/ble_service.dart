@@ -8,6 +8,7 @@ class BLEService extends ChangeNotifier {
 
   bool isReady = false;
   bool isSetup = false;
+  bool start = false;
 
   StreamSubscription? _subscription;
   final targetDevices = <MyDevice>[];
@@ -28,7 +29,11 @@ class BLEService extends ChangeNotifier {
   }
 
   startScan() {
+    start = false;
     disconnect();
+    while(!start) {
+      //wait for ble to be ready
+    }
     if (!isReady) {
       return;
     }
@@ -92,6 +97,7 @@ class BLEService extends ChangeNotifier {
     for (MyDevice device in targetDevices) {
       await device.disconnect();
     }
+    start = true;
     isSetup = false;
     notifyListeners();
   }
