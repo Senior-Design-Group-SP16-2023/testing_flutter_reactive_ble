@@ -86,6 +86,15 @@ class MyDevice {
   //data format
   //x y z are 2 bytes each, time is 4 bytes
 
+  int convert(int data){
+    if(data & 0x80 != 0) {
+      return -((~data & 0xFF) + 1);
+    }
+    return data;
+  }
+
+
+
   Future<void> beginReading() async {
     _readSubscription = _dataCharacteristic.subscribe().listen((event) {
       if (kDebugMode) {
@@ -102,36 +111,19 @@ class MyDevice {
 
         print(hexString);
 
-        int gyroX = int.parse(hexString.substring(0, 2), radix: 16);
-        if(gyroX & 0x8000 != 0) {
-          gyroX = -((~gyroX & 0xFFFF) + 1);
-        }
+        int gyroX = convert(int.parse(hexString.substring(0, 2), radix: 16));
 
 
-        int gyroY = int.parse(hexString.substring(2, 4), radix: 16);
-        if(gyroY & 0x8000 != 0) {
-          gyroY = -((~gyroY & 0xFFFF) + 1);
-        }
+        int gyroY = convert(int.parse(hexString.substring(2, 4), radix: 16));
 
-        int gyroZ = int.parse(hexString.substring(4, 6), radix: 16);
-        if(gyroZ & 0x8000 != 0) {
-          gyroZ = -((~gyroZ & 0xFFFF) + 1);
-        }
 
-        int accelX = int.parse(hexString.substring(6, 8), radix: 16);
-        if(accelX & 0x8000 != 0) {
-          accelX = -((~accelX & 0xFFFF) + 1);
-        }
+        int gyroZ = convert(int.parse(hexString.substring(4, 6), radix: 16));
 
-        int accelY = int.parse(hexString.substring(8, 10), radix: 16);
-        if(accelY & 0x8000 != 0) {
-          accelY = -((~accelY & 0xFFFF) + 1);
-        }
+        int accelX = convert(int.parse(hexString.substring(6, 8), radix: 16));
 
-        int accelZ = int.parse(hexString.substring(10, 12), radix: 16);
-        if(accelZ & 0x8000 != 0) {
-          accelZ = -((~accelZ & 0xFFFF) + 1);
-        }
+        int accelY = convert(int.parse(hexString.substring(8, 10), radix: 16));
+
+        int accelZ = convert(int.parse(hexString.substring(10, 12), radix: 16));
 
         int timestamp = int.parse(hexString.substring(12, 16), radix: 16);
 
