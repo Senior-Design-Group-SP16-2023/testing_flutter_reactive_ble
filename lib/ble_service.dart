@@ -115,6 +115,13 @@ class BLEService extends ChangeNotifier {
     for (MyDevice device in targetDevices) {
       device.endReading();
     }
+    List<List<List<int>>> data = [];
+    for (MyDevice device in targetDevices) {
+      data.add(device.getData());
+    }
+    // if(kDebugMode) {
+    //   print(data);
+    // }
   }
 
   beginCalibration() {
