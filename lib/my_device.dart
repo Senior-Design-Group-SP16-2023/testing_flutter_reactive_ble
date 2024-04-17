@@ -8,6 +8,11 @@ class MyDevice {
   StreamSubscription<List<int>>? _readSubscription;
   ValueNotifier<bool> isReadyNotifier = ValueNotifier<bool>(false);
 
+  List<int> X = [];
+  List<int> Y = [];
+  List<int> Z = [];
+  List<int> time = [];
+
   static const String sensorServiceUUID =
       '7147ac18-c824-438e-8506-60829fbd96a3';
 
@@ -78,10 +83,25 @@ class MyDevice {
     await _configCharacteristic.write([0x00]);
   }
 
+  //data format
+  //x y z are 2 bytes each, time is 4 bytes
+
   Future<void> beginReading() async {
     _readSubscription = _dataCharacteristic.subscribe().listen((event) {
       if (kDebugMode) {
-        print(event);
+        //byte string, 16 bytes long, first 2 are x
+
+        int gyroX = event[0] + (event[1] << 8);
+        int gyroY = event[2] + (event[3] << 8);
+        int gyroZ = event[4] + (event[5] << 8);
+        int accelX = event[6] + (event[7] << 8);
+        int accelY = event[8] + (event[9] << 8);
+        int accelZ = event[10] + (event[11] << 8);
+        int timestamp = event[12] + (event[13] << 8) + (event[14] << 16) + (event[15] << 24);
+        print('gyroX: $gyroX, gyroY: $gyroY, gyroZ: $gyroZ, accelX: $accelX, accelY: $accelY, accelZ: $accelZ, timestamp: $timestamp');
+
+
+
       }
     });
   }
