@@ -86,17 +86,16 @@ class MyDevice {
   //data format
   //x y z are 2 bytes each, time is 4 bytes
 
-  static const int max = 2^15-1;
+  static const int max = (2^15)-1;
   static const int sub = 2^16;
 
   int convert(int data){
+    print(data);
     if(data > max){
       return data - sub;
     }
     return data;
   }
-
-
 
   Future<void> beginReading() async {
     _readSubscription = _dataCharacteristic.subscribe().listen((event) {
