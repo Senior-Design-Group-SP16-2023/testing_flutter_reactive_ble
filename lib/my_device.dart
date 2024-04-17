@@ -105,6 +105,16 @@ class MyDevice {
         print('gyroX: $gyroX, gyroY: $gyroY, gyroZ: $gyroZ, accelX: $accelX, accelY: $accelY, accelZ: $accelZ, timestamp: $timestamp');
 
 
+        int gyroXb = event[0] | (event[1] << 8);
+        int gyroYb = event[2] | (event[3] << 8);
+        int gyroZb = event[4] | (event[5] << 8);
+        int accelXb = event[6]| (event[7] << 8);
+        int accelYb = event[8] | (event[9] << 8);
+        int accelZb = event[10] | (event[11] << 8);
+        int timestampb = event[12] | (event[13] << 8) | (event[14] << 16) | (event[15] << 24);
+        print('gyroXb: $gyroXb, gyroYb: $gyroYb, gyroZb: $gyroZb, accelXb: $accelXb, accelYb: $accelYb, accelZb: $accelZb, timestampb: $timestampb');
+
+
 
       }
     });
