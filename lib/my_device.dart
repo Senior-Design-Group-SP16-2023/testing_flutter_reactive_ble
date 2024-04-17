@@ -107,25 +107,23 @@ class MyDevice {
         //each string pair needs to be swapped, so 0 need to be 1 and 1 needs to be 0
         final correctEvent = [event[1], event[0], event[3], event[2], event[5], event[4], event[7], event[6], event[9], event[8], event[11], event[10], event[12], event[13], event[14], event[15]];
 
-        final hexString = correctEvent.map((e) => e.toRadixString(16)).join();
-
-        print(hexString);
-
-        int gyroX = convert(int.parse(hexString.substring(0, 2), radix: 16));
+        print(correctEvent);
 
 
-        int gyroY = convert(int.parse(hexString.substring(2, 4), radix: 16));
+        int gyroX = convert(correctEvent[0] | (correctEvent[1] << 8));
 
+        int gyroY = convert(correctEvent[2] | (correctEvent[3] << 8));
 
-        int gyroZ = convert(int.parse(hexString.substring(4, 6), radix: 16));
+        int gyroZ = convert(correctEvent[4] | (correctEvent[5] << 8));
 
-        int accelX = convert(int.parse(hexString.substring(6, 8), radix: 16));
+        int accelX = convert(correctEvent[6] | (correctEvent[7] << 8));
 
-        int accelY = convert(int.parse(hexString.substring(8, 10), radix: 16));
+        int accelY = convert(correctEvent[8] | (correctEvent[9] << 8));
 
-        int accelZ = convert(int.parse(hexString.substring(10, 12), radix: 16));
+        int accelZ = convert(correctEvent[10] | (correctEvent[11] << 8));
 
-        int timestamp = int.parse(hexString.substring(12, 16), radix: 16);
+        int timestamp = correctEvent[12] | (correctEvent[13] << 8) | (correctEvent[14] << 16) | (correctEvent[15] << 24);
+
 
         print('gyroX: $gyroX, gyroY: $gyroY, gyroZ: $gyroZ, accelX: $accelX, accelY: $accelY, accelZ: $accelZ, timestamp: $timestamp');
 
